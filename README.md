@@ -1,51 +1,81 @@
-# Adaptive Study — Taller 1
+# Adaptive Study 2.0 — Taller 1
 
-Aplicación Android nativa desarrollada en Kotlin para demostrar comportamiento adaptativo en tiempo real.
+Aplicación Android nativa en Kotlin que demuestra comportamiento adaptativo mediante sensores del dispositivo y la interacción del usuario.
 
-## Qué detecta
+## Función principal
 
-1. **Luminosidad ambiental (sensor de luz)**
-   - Menos de 20 lux → modo nocturno.
-   - Entre 20 y 800 lux → modo normal.
-   - Más de 800 lux → alto contraste.
+La app ahora incluye un **quiz real de 10 preguntas** con cuatro alternativas, validación inmediata, explicación, puntaje, progreso y almacenamiento local del mejor resultado.
 
-2. **Batería**
-   - 20% o menos y sin cargar → modo ahorro.
-   - En modo ahorro se oculta contenido secundario y se reduce el énfasis visual.
+La dificultad también se adapta automáticamente:
+
+- inicia en **Fácil**;
+- 2 aciertos consecutivos → sube un nivel;
+- 2 errores consecutivos → baja un nivel cuando sea posible.
+
+## Contextos detectados y adaptaciones
+
+### 1. Luminosidad ambiental
+
+- menos de 20 lux → modo nocturno;
+- entre 20 y 800 lux → modo normal;
+- más de 800 lux → alto contraste.
+
+### 2. Batería
+
+- 20% o menos y sin cargar → modo ahorro;
+- en ahorro se oculta contenido secundario y el refresco de contexto baja de 15 s a 45 s;
+- al cargar el dispositivo, el modo ahorro se desactiva.
+
+### 3. Orientación
+
+- vertical → quiz apilado;
+- horizontal → pregunta y alternativas se distribuyen en dos columnas.
+
+### 4. Interacción del usuario
+
+- racha de aciertos → aumenta dificultad;
+- racha de errores → reduce dificultad.
 
 ## Pipeline
 
 `CONTEXTO → PROCESAMIENTO → DECISIÓN → ADAPTACIÓN`
 
-- Contexto: `BatteryContextProvider.kt`, `LightContextProvider.kt`
-- Procesamiento: `ContextManager.kt`
-- Decisión: `AdaptationEngine.kt`
-- Adaptación/interfaz: `MainActivity.kt`
+- Captura: `context/BatteryContextProvider.kt`, `context/LightContextProvider.kt`
+- Procesamiento: `processing/ContextManager.kt`
+- Reglas: `config/AdaptationRules.kt`
+- Decisión ambiental: `decision/AdaptationEngine.kt`
+- Decisión de aprendizaje: `quiz/QuizEngine.kt`
+- Adaptación observable: `ui/MainActivity.kt`
 
-## Ejecutar en Android Studio
+## Demo recomendada
 
-1. Abrir la carpeta del proyecto `AdaptiveStudy`.
-2. Esperar a que Gradle sincronice.
-3. Conectar un Android físico con depuración USB o usar un emulador.
+1. Abrir la app y responder preguntas.
+2. Acertar dos seguidas para observar el cambio de dificultad.
+3. Tapar el sensor de luz para activar el modo nocturno automáticamente.
+4. Girar el celular para mostrar la reorganización automática de la interfaz.
+5. Si la batería está baja, mostrar el modo ahorro; conectar el cargador para demostrar el cambio de contexto.
+
+## Ejecutar
+
+1. Abrir el proyecto en Android Studio.
+2. Esperar la sincronización de Gradle.
+3. Conectar un Android físico o usar emulador.
 4. Ejecutar `app`.
-5. Para generar APK: **Build → Build APK(s)**.
+5. Para APK: **Build → Build APK(s)**.
 
-> Recomendación para la demo: usar un celular físico porque el sensor de luz se demuestra mejor cubriéndolo con la mano o acercándolo a una fuente de luz.
-
-## Compilar con GitHub Actions
-
-El repositorio incluye `.github/workflows/build-apk.yml`. Al subir el proyecto a GitHub, el workflow compila un APK debug y lo publica como artifact llamado `AdaptiveStudy-debug-apk`.
+También existe `.github/workflows/build-apk.yml`, que compila automáticamente un APK debug y lo publica como artifact `AdaptiveStudy-debug-apk`.
 
 ## Requisitos
 
-- Android Studio reciente
 - Android SDK 35
 - JDK 17
+- minSdk 23
 
 ## Reto técnico rápido
 
-Los umbrales están centralizados en `AdaptationEngine.kt`. Ejemplos de cambios sencillos durante la sustentación:
+Los parámetros de adaptación están centralizados en `AdaptationRules.kt`. Ejemplos:
 
-- Cambiar batería baja de 20% a 30%.
-- Cambiar modo nocturno de 20 lux a 50 lux.
-- Añadir una nueva regla para luz intensa.
+- cambiar batería baja de 20% a 30%;
+- cambiar modo nocturno de 20 lux a 50 lux;
+- cambiar la racha requerida para modificar dificultad;
+- modificar la frecuencia de actualización en modo ahorro.
